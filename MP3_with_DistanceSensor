@@ -1,0 +1,72 @@
+// PROGRAMMED BY: Mudassir Nadeem
+
+#include <Arduino.h>
+
+///////PaZhong Automation\\\\\\\\\\
+//////DF.MINI.MP3 PLAYER\\\\\\\\\\\\
+
+
+//defining variables
+#include "SoftwareSerial.h"
+#include "DFRobotDFPlayerMini.h"
+
+// Use pins 2 and 3 to communicate with DFPlayer Mini
+static const uint8_t PIN_MP3_TX = 2; // Connects to module's RX 
+static const uint8_t PIN_MP3_RX = 3; // Connects to module's TX 
+SoftwareSerial softwareSerial(PIN_MP3_RX, PIN_MP3_TX);
+
+int irPin = A0;
+int irValue = 0;
+const int trigPin = 5;  // Trigger pin of the ultrasonic sensor
+const int echoPin = 4;  // Echo pin of the ultrasonic sensor
+int distance = 0;
+int duration = 0;
+
+
+// Create the Player object
+DFRobotDFPlayerMini player;
+
+void setup() {
+
+  // Init USB serial port for debugging
+  Serial.begin(9600);
+  // Init serial port for DFPlayer Mini
+  softwareSerial.begin(9600);
+
+  // Start communication with DFPlayer Mini
+
+  player.begin(softwareSerial); // DFPlayer Mini
+
+  pinMode(trigPin, OUTPUT);  // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT);   // Sets the echoPin as an Input
+  pinMode(irPin, INPUT);    // Sets the irPin as an Input
+  
+}
+
+void loop() {
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(1000);
+  digitalWrite(echoPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration/2) / 28.5;
+  // Read the sensor value
+  irValue = digitalRead(irPin);
+  if (irValue == LOW) {
+    // Set volume to maximum (0 to 30).
+    player.volume(25);
+    // Play the first MP3 file on the SD card
+    player.play(0001);
+    delay(2000);
+    
+  }
+  if (distance < 10) {
+    // Set volume to maximum (0 to 30).
+    player.volume(25);
+    // Play the first MP3 file on the SD card
+    player.play(0002);
+    delay(2000);
+  }
+     
+}
